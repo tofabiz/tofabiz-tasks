@@ -21,7 +21,9 @@ const elements = {
     taskMeetingDate: document.getElementById('taskMeetingDate'),
     taskDeadline: document.getElementById('taskDeadline'),
     taskPriority: document.getElementById('taskPriority'),
-    taskStatus: document.getElementById('taskStatus')
+    taskStatus: document.getElementById('taskStatus'),
+    taskImage: document.getElementById('taskImage'),
+    imagePreview: document.getElementById('imagePreview')
 };
 
 // ===== Initialize App =====
@@ -39,6 +41,7 @@ function attachEventListeners() {
     elements.modalOverlay.addEventListener('click', closeModal);
     elements.cancelBtn.addEventListener('click', closeModal);
     elements.taskForm.addEventListener('submit', handleFormSubmit);
+    elements.taskImage.addEventListener('change', handleImageSelect);
 }
 
 // ===== Modal Functions =====
@@ -46,6 +49,7 @@ function openAddTaskModal() {
     editingTaskId = null;
     elements.modalTitle.textContent = '새 업무 등록';
     elements.taskForm.reset();
+    elements.imagePreview.innerHTML = '';
     elements.taskModal.classList.add('show');
 }
 
@@ -61,6 +65,13 @@ function openEditTaskModal(taskId) {
         elements.taskDeadline.value = task.deadline || '';
         elements.taskPriority.value = task.priority;
         elements.taskStatus.value = task.status;
+
+        // Load existing image if available
+        elements.imagePreview.innerHTML = '';
+        if (task.image) {
+            displayImagePreview(task.image);
+        }
+
         elements.taskModal.classList.add('show');
     }
 }
@@ -68,7 +79,55 @@ function openEditTaskModal(taskId) {
 function closeModal() {
     elements.taskModal.classList.remove('show');
     elements.taskForm.reset();
+    elements.imagePreview.innerHTML = '';
     editingTaskId = null;
+}
+
+// ===== Image Handling =====
+function handleImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file size (max 1MB)
+    if (file.size > 1024 * 1024) {
+        alert('이미지 크기는 1MB 이하여야 합니다.');
+        e.target.value = '';
+        return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.');
+        e.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        displayImagePreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+function displayImagePreview(imageData) {
+    elements.imagePreview.innerHTML = `
+        <div class="image-preview-item">
+            <img src="${imageData}" alt="Preview">
+            <button type="button" class="image-preview-remove" onclick="removeImage()">
+                ×
+            </button>
+        </div>
+    `;
+}
+
+function removeImage() {
+    elements.imagePreview.innerHTML = '';
+    elements.taskImage.value = '';
+}
+
+function getImageData() {
+    const img = elements.imagePreview.querySelector('img');
+    return img ? img.src : null;
 }
 
 // ===== Form Handling =====
@@ -81,7 +140,8 @@ function handleFormSubmit(e) {
         meetingDate: elements.taskMeetingDate.value,
         deadline: elements.taskDeadline.value,
         priority: elements.taskPriority.value,
-        status: elements.taskStatus.value
+        status: elements.taskStatus.value,
+        image: getImageData()
     };
 
     if (editingTaskId) {
@@ -200,10 +260,10 @@ function animateValue(element, start, end, duration) {
 function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
-    const year = date.getFullYear();
+    const year = String(date.getFullYear()).slice(-2); // Last 2 digits of year
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}.${month}.${day}`;
+    return `${year}${month}${day}`;
 }
 
 function showNotification(message, type = 'info') {
@@ -223,7 +283,10 @@ function renderTasks() {
     elements.tasksTableBody.innerHTML = tasks.map(task => `
         <tr data-task-id="${task.id}" class="${getMeetingColorClass(task.meetingDate)}">
             <td>
-                <div class="task-name">${escapeHtml(task.name)}</div>
+                <div class="task-name">
+                    ${escapeHtml(task.name)}
+                    ${task.image ? `<br><img src="${task.image}" class="task-image-thumb" alt="업무 이미지" title="클릭하여 확대">` : ''}
+                </div>
             </td>
             <td>
                 <div class="task-assignee">${escapeHtml(task.assignee)}</div>
@@ -263,9 +326,9 @@ function updateStats() {
     const inProgress = tasks.filter(t => t.status === '진행 중').length;
     const completed = tasks.filter(t => t.status === '완료').length;
 
-    animateValue(elements.totalTasks, parseInt(elements.totalTasks.textContent) || 0, total, 500);
-    animateValue(elements.inProgressTasks, parseInt(elements.inProgressTasks.textContent) || 0, inProgress, 500);
-    animateValue(elements.completedTasks, parseInt(elements.completedTasks.textContent) || 0, completed, 500);
+    elements.totalTasks.textContent = total;
+    elements.inProgressTasks.textContent = inProgress;
+    elements.completedTasks.textContent = completed;
 }
 
 // ===== Local Storage =====
