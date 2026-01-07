@@ -625,6 +625,12 @@ body {
     font-size: 0.9rem;
 }
 
+.form-group label .hint {
+    font-weight: 400;
+    color: var(--color-text-tertiary);
+    font-size: 0.85rem;
+}
+
 .form-group input,
 .form-group select {
     width: 100%;
