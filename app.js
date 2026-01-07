@@ -42,6 +42,9 @@ function attachEventListeners() {
     elements.cancelBtn.addEventListener('click', closeModal);
     elements.taskForm.addEventListener('submit', handleFormSubmit);
     elements.taskImage.addEventListener('change', handleImageSelect);
+
+    // Add paste event listener for the entire modal
+    document.addEventListener('paste', handlePaste);
 }
 
 // ===== Modal Functions =====
@@ -107,6 +110,36 @@ function handleImageSelect(e) {
         displayImagePreview(event.target.result);
     };
     reader.readAsDataURL(file);
+}
+
+function handlePaste(e) {
+    // Only handle paste when modal is open
+    if (!elements.taskModal.classList.contains('show')) return;
+
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault(); // Prevent default paste behavior
+
+            const file = items[i].getAsFile();
+
+            // Check file size (max 1MB)
+            if (file.size > 1024 * 1024) {
+                alert('이미지 크기는 1MB 이하여야 합니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                displayImagePreview(event.target.result);
+                showNotification('이미지가 붙여넣기 되었습니다!', 'success');
+            };
+            reader.readAsDataURL(file);
+            break;
+        }
+    }
 }
 
 function displayImagePreview(imageData) {
