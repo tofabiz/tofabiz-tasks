@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="팀의 업무를 효율적으로 관리하는 Tofabiz Tasks">
+    <title>Tofabiz Tasks - 업무 관리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="logo">Tofabiz Tasks</h1>
+                    <p class="subtitle">토파비즈 팀의 업무를 한눈에 관리하세요.</p>
+                </div>
+                <button class="btn-primary" id="addTaskBtn">
+                    <span class="btn-icon">+</span> 새 업무 등록
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card stat-card-blue">
+                    <div class="stat-label">전체 업무</div>
+                    <div class="stat-value" id="totalTasks">0</div>
+                </div>
+                <div class="stat-card stat-card-purple">
+                    <div class="stat-label">진행 중</div>
+                    <div class="stat-value" id="inProgressTasks">0</div>
+                </div>
+                <div class="stat-card stat-card-green">
+                    <div class="stat-label">완료됨</div>
+                    <div class="stat-value" id="completedTasks">0</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tasks Table -->
+        <section class="tasks-section">
+            <div class="table-container">
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th class="col-name">업무 명칭</th>
+                            <th class="col-assignee">담당자</th>
+                            <th class="col-date">회의 날짜</th>
+                            <th class="col-date">마감일</th>
+                            <th class="col-priority">우선순위</th>
+                            <th class="col-status">상태</th>
+                            <th class="col-actions">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <!-- Tasks will be dynamically inserted here -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📋</div>
+                    <p class="empty-text">아직 등록된 업무가 없습니다</p>
+                    <p class="empty-subtext">새 업무를 추가하여 시작하세요!</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal for Add/Edit Task -->
+    <div class="modal" id="taskModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">새 업무 등록</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskName">업무 명칭 *</label>
+                    <input type="text" id="taskName" required placeholder="업무 이름을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="taskAssignee">담당자 *</label>
+                    <input type="text" id="taskAssignee" required placeholder="담당자 이름을 입력하세요">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskMeetingDate">회의 날짜</label>
+                        <input type="date" id="taskMeetingDate" placeholder="회의 날짜를 선택하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDeadline">마감일</label>
+                        <input type="date" id="taskDeadline" placeholder="마감일을 선택하세요">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">우선순위 *</label>
+                        <select id="taskPriority" required>
+                            <option value="">선택하세요</option>
+                            <option value="높음">높음</option>
+                            <option value="중간">중간</option>
+                            <option value="낮음">낮음</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskStatus">상태 *</label>
+                        <select id="taskStatus" required>
+                            <option value="">선택하세요</option>
+                            <option value="진행 중">진행 중</option>
+                            <option value="할 일">할 일</option>
+                            <option value="완료">완료</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">취소</button>
+                    <button type="submit" class="btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
