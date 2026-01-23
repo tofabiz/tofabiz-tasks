@@ -456,3 +456,4 @@ document.addEventListener('keydown', (e) => {
 
 // ===== Start App =====
 init();
+
